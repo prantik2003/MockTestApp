@@ -3,21 +3,25 @@ package com.example.demo.controller;
 import com.example.demo.model.LoginRequest;
 import com.example.demo.model.LoginResponse;
 import com.example.demo.service.LoginService;
+import com.example.demo.service.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/login")
 public class LoginController {
 
     @Autowired
-    private LoginService loginService;
+    private RegistrationService registrationService;
 
-    @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
-        return loginService.validateLogin(loginRequest);
+    @PostMapping()
+    public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
+        if(registrationService.validateLogin(loginRequest).isSuccess()){
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
+
 }
