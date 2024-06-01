@@ -1,16 +1,18 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.LoginRequest;
-import com.example.demo.model.LoginResponse;
+
+import com.example.demo.exception.InvalidInputException;
 import com.example.demo.model.RegistrationRequest;
-import com.example.demo.model.RegistrationResponse;
+import com.example.demo.model.User;
 import com.example.demo.service.RegistrationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -21,13 +23,17 @@ public class RegistrationController {
     private RegistrationService registrationService;
 
     @PostMapping()
-    public ResponseEntity<RegistrationResponse> registration(@RequestBody RegistrationRequest registrationRequest) {
-        return new ResponseEntity<>(registrationService.registration(registrationRequest), HttpStatus.CREATED);
+    public ResponseEntity<User> registration(@RequestBody RegistrationRequest registrationRequest){
+        try {
+            return new ResponseEntity<>(registrationService.registration(registrationRequest), HttpStatus.CREATED);
+        }catch(InvalidInputException | JsonProcessingException ex){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping()
-    public ResponseEntity<ArrayList> getRegisteredUsers() {
-        return new ResponseEntity<ArrayList>(registrationService.getRegisteredUsers(), HttpStatus.OK);
+    public ResponseEntity<List<User>> getRegisteredUsers() {
+        return ResponseEntity.ok(registrationService.getRegisteredUsers());
     }
 
     @GetMapping("/user/{userId}")
@@ -38,5 +44,7 @@ public class RegistrationController {
         }
         return new ResponseEntity<>(registrationRequest,HttpStatus.OK);
     }
+
+
 
 }
